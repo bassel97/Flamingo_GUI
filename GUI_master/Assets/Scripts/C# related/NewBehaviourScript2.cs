@@ -6,6 +6,8 @@ using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Threading;
+//using Asyncoroutine;
 
 /*public class Message
 {
@@ -24,20 +26,26 @@ public class NewBehaviourScript2 : MonoBehaviour
     [Header("Server Data")]
     public int _port = 54000;
 
-    public InputField testString;
+    //public InputField testString;
 
-    public Text consoleText;
+    //public Text consoleText;
 
     TcpClient client;
 
-    Stream s;
+    NetworkStream s;
     StreamReader sr;
     StreamWriter sw;
+
+    bool recievingInCorutine = false;
 
     SendOptions sendOptions;
     string ip;
     string port;
 
+    #region private members 	
+    private TcpClient socketConnection;
+    private Thread clientReceiveThread;
+    #endregion
 
     [Header("Game Data")]
     [SerializeField] private BoardObject boardObject = null;
@@ -53,11 +61,12 @@ public class NewBehaviourScript2 : MonoBehaviour
             sr = new StreamReader(s);
             sw = new StreamWriter(s);
             sw.AutoFlush = true;
+
         }
         catch (Exception e)
         {
-            //Debug.Log("Start " + e);
-            consoleText.text = "exception : " + e;
+            Debug.Log("Start " + e);
+            //consoleText.text = "exception : " + e;
         }
     }
 
@@ -69,34 +78,47 @@ public class NewBehaviourScript2 : MonoBehaviour
 
         sendOptions = SendOptions.AI_VS_AI;
 
-        StartProtocol();
+        //StartProtocol();
+
+        ExecuteClientThread();
+
+        //StartCoroutine(ExecuteClientThread());
+
+        /*clientReceiveThread = new Thread(new ThreadStart(ExecuteClientThread));
+        clientReceiveThread.IsBackground = true;
+        clientReceiveThread.Start();*/
     }
 
-    public void StartProtocol()
+    /*public void StartProtocol()
     {
         StartCoroutine(ExecuteClientThread());
+    }*/
+
+    public void ExecuteClientThread()
+    {
+        while (!recievingInCorutine)
+        {
+            SendAndCreateToServer();
+
+            StartCoroutine(RecieveAndParseServerReply());
+
+            //sr.ReadLine();
+
+            //sendOptions = SendOptions.AckAI_VS_AI;
+
+            //Debug.Log(s);
+
+            //yield return null;
+        }
     }
 
-    public IEnumerator ExecuteClientThread()
+    private void Update()
     {
-        while (true)
+        if (!recievingInCorutine)
         {
-            try
-            {
-                SendAndCreateToServer();
-                s.Flush();
+            SendAndCreateToServer();
 
-                //sr.p
-                if (sr.Peek() != -1)
-                    RecieveAndParseServerReply();
-
-                Debug.Log(s);
-            }
-            catch (Exception e)
-            {
-                Debug.Log("ExecuteClient() " + e);
-            }
-            yield return null;
+            StartCoroutine(RecieveAndParseServerReply());
         }
     }
 
@@ -149,8 +171,13 @@ public class NewBehaviourScript2 : MonoBehaviour
         }
     }
 
-    private void RecieveAndParseServerReply()
+    private IEnumerator RecieveAndParseServerReply()
     {
+        recievingInCorutine = true;
+
+        while (!s.DataAvailable)
+            yield return null;
+
         string ServerReply = sr.ReadLine();
 
         Dictionary<string, object> ServerReplyDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(ServerReply);
@@ -224,6 +251,8 @@ public class NewBehaviourScript2 : MonoBehaviour
             default:
                 break;
         }
+
+        recievingInCorutine = false;
     }
 
     private void OnApplicationQuit()

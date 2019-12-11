@@ -2339,8 +2339,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _port: 4500
-  testString: {fileID: 1108985433}
-  consoleText: {fileID: 1338021620}
   boardObject: {fileID: 868518118}
   manager: {fileID: 0}
 --- !u!1 &1309232114
