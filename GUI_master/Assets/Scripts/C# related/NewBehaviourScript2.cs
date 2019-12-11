@@ -166,6 +166,10 @@ public class NewBehaviourScript2 : MonoBehaviour
                 SendAck();
                 break;
 
+            case SendOptions.Ack:
+                SendAck();
+                break;
+
             default:
                 break;
         }
@@ -202,7 +206,7 @@ public class NewBehaviourScript2 : MonoBehaviour
             case MsgsEnum.moveConfigrations:
 
                 MoveData moveConfigData = JsonConvert.DeserializeObject<MoveData>(serverMsg);
-                boardObject.PlaceStone(moveConfigData.x, moveConfigData.y, moveConfigData.color != 'b');
+                boardObject.PlaceStone(moveConfigData.y, moveConfigData.x, moveConfigData.color != 'b');
 
                 break;
 
@@ -234,7 +238,9 @@ public class NewBehaviourScript2 : MonoBehaviour
                 moveData.countCaptured = 0;
 
                 moveData = JsonConvert.DeserializeObject<MoveData>(serverMsg);
-                boardObject.PlaceStone(moveData.x, moveData.y, moveData.color != 'b');
+                boardObject.PlaceStone(moveData.y, moveData.x, moveData.color != 'b');
+
+                sendOptions = SendOptions.Ack;
 
                 break;
 
@@ -244,7 +250,9 @@ public class NewBehaviourScript2 : MonoBehaviour
             case MsgsEnum.remove:
 
                 RemoveData removeData = JsonConvert.DeserializeObject<RemoveData>(serverMsg);
-                boardObject.RemoveStone(removeData.x, removeData.y);
+                boardObject.RemoveStone(removeData.y, removeData.x);
+
+                sendOptions = SendOptions.Ack;
 
                 break;
 
@@ -269,5 +277,6 @@ public class NewBehaviourScript2 : MonoBehaviour
 public enum SendOptions
 {
     AI_VS_AI,
-    AckAI_VS_AI
+    AckAI_VS_AI,
+    Ack
 }
