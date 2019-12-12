@@ -7,28 +7,11 @@ using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Threading;
-//using Asyncoroutine;
-
-/*public class Message
-{
-    public int type { get; set; }
-    public Messagemsg msg { get; set; }
-}
-public class Messagemsg
-{
-    public bool initialBoard { get; set; }
-    public int theirRemainingTime { get; set; }
-    public int initialCount { get; set; }
-}*/
 
 public class NewBehaviourScript2 : MonoBehaviour
 {
     [Header("Server Data")]
     public int _port = 54000;
-
-    //public InputField testString;
-
-    //public Text consoleText;
 
     TcpClient client;
 
@@ -38,18 +21,12 @@ public class NewBehaviourScript2 : MonoBehaviour
 
     bool recievingInCorutine = false;
 
-    SendOptions sendOptions;
-    string ip;
-    string port;
-
-    #region private members 	
-    private TcpClient socketConnection;
-    private Thread clientReceiveThread;
-    #endregion
-
     [Header("Game Data")]
     [SerializeField] private BoardObject boardObject = null;
     [SerializeField] private Manager manager = null;
+
+    [Header("Logger")]
+    [SerializeField] private Text loggerText = null;
 
     void Start()
     {
@@ -70,54 +47,10 @@ public class NewBehaviourScript2 : MonoBehaviour
         }
     }
 
-    //string ip, string port
-    public void AI_VS_AI()
-    {
-        this.ip = "1270";
-        this.port = "1547";
-
-        sendOptions = SendOptions.AI_VS_AI;
-
-        //StartProtocol();
-
-        ExecuteClientThread();
-
-        //StartCoroutine(ExecuteClientThread());
-
-        /*clientReceiveThread = new Thread(new ThreadStart(ExecuteClientThread));
-        clientReceiveThread.IsBackground = true;
-        clientReceiveThread.Start();*/
-    }
-
-    /*public void StartProtocol()
-    {
-        StartCoroutine(ExecuteClientThread());
-    }*/
-
-    public void ExecuteClientThread()
-    {
-        while (!recievingInCorutine)
-        {
-            SendAndCreateToServer();
-
-            StartCoroutine(RecieveAndParseServerReply());
-
-            //sr.ReadLine();
-
-            //sendOptions = SendOptions.AckAI_VS_AI;
-
-            //Debug.Log(s);
-
-            //yield return null;
-        }
-    }
-
     private void Update()
     {
-        if (!recievingInCorutine)
+        if (!recievingInCorutine && s != null)
         {
-            SendAndCreateToServer();
-
             StartCoroutine(RecieveAndParseServerReply());
         }
     }
@@ -134,9 +67,10 @@ public class NewBehaviourScript2 : MonoBehaviour
         ackMsg += "\"\"" + "}";
 
         sw.WriteLine(ackMsg);
+        loggerText.text += "Sent " + ackMsg + "\n";
     }
 
-    private void SendAI_VS_AI_Data()
+    public void SendAI_VS_AI_Data(string ip, string port)
     {
         Dictionary<string, int> dictionary = new Dictionary<string, int>();
         dictionary.Add("type", (int)MsgsEnum.AI_VS_AI);
@@ -152,9 +86,79 @@ public class NewBehaviourScript2 : MonoBehaviour
         ackMsg += JsonConvert.SerializeObject(aI_VS_AI_Data) + "}";
 
         sw.WriteLine(ackMsg);
+        loggerText.text += "Sent " + ackMsg + "\n";
     }
 
-    private void SendAndCreateToServer()
+    public void SendHuman_VS_AI_Data(char serverColor, int initialCount)
+    {
+        Dictionary<string, int> dictionary = new Dictionary<string, int>();
+        dictionary.Add("type", (int)MsgsEnum.AI_VSHuman);
+        dictionary.Add("msg", 0);
+
+        string ackMsg = JsonConvert.SerializeObject(dictionary);
+
+        Human_VS_AI_Data human_VS_AI_Data = new Human_VS_AI_Data();
+        human_VS_AI_Data.myColor = serverColor;
+        human_VS_AI_Data.initialCount = initialCount;
+
+        ackMsg = ackMsg.Remove(ackMsg.Length - 2);
+        ackMsg += JsonConvert.SerializeObject(human_VS_AI_Data) + "}";
+
+        sw.WriteLine(ackMsg);
+        loggerText.text += "Sent " + ackMsg + "\n";
+    }
+
+    public void SendMoveData(int x, int y, char color)
+    {
+        Dictionary<string, int> dictionary = new Dictionary<string, int>();
+        dictionary.Add("type", (int)MsgsEnum.move);
+        dictionary.Add("msg", 0);
+
+        string ackMsg = JsonConvert.SerializeObject(dictionary);
+
+        MoveData human_VS_AI_Data = new MoveData();
+        human_VS_AI_Data.x = x;
+        human_VS_AI_Data.y = y;
+        human_VS_AI_Data.color = color;
+
+        ackMsg = ackMsg.Remove(ackMsg.Length - 2);
+        ackMsg += JsonConvert.SerializeObject(human_VS_AI_Data) + "}";
+
+        sw.WriteLine(ackMsg);
+        loggerText.text += "Sent " + ackMsg + "\n";
+    }
+
+    public void SendForfeit()
+    {
+        Dictionary<string, int> dictionary = new Dictionary<string, int>();
+        dictionary.Add("type", (int)MsgsEnum.forfeit);
+        dictionary.Add("msg", 0);
+
+        string ackMsg = JsonConvert.SerializeObject(dictionary);
+
+        ackMsg = ackMsg.Remove(ackMsg.Length - 2);
+        ackMsg += "\"\"" + "}";
+
+        sw.WriteLine(ackMsg);
+        loggerText.text += "Sent " + ackMsg + "\n";
+    }
+
+    public void SendGameExit()
+    {
+        Dictionary<string, int> dictionary = new Dictionary<string, int>();
+        dictionary.Add("type", (int)MsgsEnum.exit);
+        dictionary.Add("msg", 0);
+
+        string ackMsg = JsonConvert.SerializeObject(dictionary);
+
+        ackMsg = ackMsg.Remove(ackMsg.Length - 2);
+        ackMsg += "\"\"" + "}";
+
+        sw.WriteLine(ackMsg);
+        loggerText.text += "Sent " + ackMsg + "\n";
+    }
+
+    /*private void SendAndCreateToServer()
     {
         switch (sendOptions)
         {
@@ -173,7 +177,7 @@ public class NewBehaviourScript2 : MonoBehaviour
             default:
                 break;
         }
-    }
+    }*/
 
     private IEnumerator RecieveAndParseServerReply()
     {
@@ -183,6 +187,9 @@ public class NewBehaviourScript2 : MonoBehaviour
             yield return null;
 
         string ServerReply = sr.ReadLine();
+
+        Debug.Log("Recvd " + ServerReply);
+        loggerText.text += "Recvd " + ServerReply + "\n";
 
         Dictionary<string, object> ServerReplyDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(ServerReply);
 
@@ -199,7 +206,8 @@ public class NewBehaviourScript2 : MonoBehaviour
 
                 AckAI_VS_AI_Data ackAI_VS_AI = JsonConvert.DeserializeObject<AckAI_VS_AI_Data>(serverMsg);
 
-                sendOptions = SendOptions.AckAI_VS_AI;
+                //sendOptions = SendOptions.AckAI_VS_AI;
+                SendAck();
 
                 break;
 
@@ -208,12 +216,18 @@ public class NewBehaviourScript2 : MonoBehaviour
                 MoveData moveConfigData = JsonConvert.DeserializeObject<MoveData>(serverMsg);
                 boardObject.PlaceStone(moveConfigData.y, moveConfigData.x, moveConfigData.color != 'b');
 
+                //sendOptions = SendOptions.Ack;
+                SendAck();
+
                 break;
 
             case MsgsEnum.gameEnd:
 
                 GameEndData gameEndData = JsonConvert.DeserializeObject<GameEndData>(serverMsg);
-                manager.EndGame(gameEndData.ourScore, gameEndData.theirScore);
+                manager.GameEnd(gameEndData.ourScore, gameEndData.theirScore, gameEndData.win);
+
+                //sendOptions = SendOptions.Ack;
+                SendAck();
 
                 break;
 
@@ -224,6 +238,15 @@ public class NewBehaviourScript2 : MonoBehaviour
                 break;
 
             case MsgsEnum.ack:
+
+                AckData ackData = JsonConvert.DeserializeObject<AckData>(serverMsg);
+                Debug.Log("Ack data " + ackData.reason + " " + ackData.valid + " " + ackData.valid);
+
+                if (ackData.valid)
+                    manager.PlayerMoveAccepted();
+
+                SendAck();
+
                 break;
 
             case MsgsEnum.gameStart:
@@ -240,7 +263,10 @@ public class NewBehaviourScript2 : MonoBehaviour
                 moveData = JsonConvert.DeserializeObject<MoveData>(serverMsg);
                 boardObject.PlaceStone(moveData.y, moveData.x, moveData.color != 'b');
 
-                sendOptions = SendOptions.Ack;
+                manager.AiPlayed();
+
+                //sendOptions = SendOptions.Ack;
+                SendAck();
 
                 break;
 
@@ -252,7 +278,8 @@ public class NewBehaviourScript2 : MonoBehaviour
                 RemoveData removeData = JsonConvert.DeserializeObject<RemoveData>(serverMsg);
                 boardObject.RemoveStone(removeData.y, removeData.x);
 
-                sendOptions = SendOptions.Ack;
+                //sendOptions = SendOptions.Ack;
+                SendAck();
 
                 break;
 
@@ -274,9 +301,9 @@ public class NewBehaviourScript2 : MonoBehaviour
     }
 }
 
-public enum SendOptions
+/*public enum SendOptions
 {
     AI_VS_AI,
     AckAI_VS_AI,
     Ack
-}
+}*/

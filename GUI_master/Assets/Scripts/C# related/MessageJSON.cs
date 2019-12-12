@@ -53,8 +53,21 @@ public class AI_VS_AI_Data
     public string port { get; set; }
 }
 
+public class Human_VS_AI_Data
+{
+    public char myColor { get; set; }
+    public int initialCount { get; set; }
+}
+
 public class RemoveData
 {
     public int x { get; set; }
     public int y { get; set; }
+}
+
+public class AckData
+{
+    public bool valid { get; set; }
+    public string reason { get; set; }
+    public int countCaptured { get; set; }
 }
