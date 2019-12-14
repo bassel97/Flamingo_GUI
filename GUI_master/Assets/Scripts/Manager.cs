@@ -27,11 +27,14 @@ public class Manager : MonoBehaviour
     [Header("GUI")]
     [SerializeField] private Text warningMessge = null;
     [SerializeField] private Text gamePausedText = null;
+    [SerializeField] private Text turnsText = null;
 
     [Header("Main Menu")]
     public GameObject mainMenu;
     public InputField[] inputMainMenu;
     public Dropdown[] dropdownMainMenu;
+
+    private bool myTurn = false;
 
     private bool humanVsAI = false;
     private bool humanInputEnabled = false;
@@ -120,7 +123,7 @@ public class Manager : MonoBehaviour
         {
             initialBoardOptions.SetActive(true);
         }
-        else
+        else if (humanInputEnabled)
         {
             forfeitButton.SetActive(true);
         }
@@ -145,7 +148,8 @@ public class Manager : MonoBehaviour
             {
                 initialBoardOptions.SetActive(false);
 
-                forfeitButton.SetActive(true);
+                if (humanInputEnabled)
+                    forfeitButton.SetActive(true);
             }
         }
         else if (humanInputEnabled)
@@ -156,24 +160,30 @@ public class Manager : MonoBehaviour
             lastMoveJ = j;
 
             humanInputEnabled = false;
+            forfeitButton.SetActive(false);
         }
     }
 
     public void AiPlayed()
     {
         if (humanVsAI)
+        {
             humanInputEnabled = true;
+            forfeitButton.SetActive(true);
+        }
     }
 
     public void PlayerMoveAccepted()
     {
         humanInputEnabled = false;
+        forfeitButton.SetActive(false);
         boardObject.PlaceStone(lastMoveI, lastMoveJ, playerColor == 'w');
     }
 
     public void PlayerMoveNotAccepted()
     {
         humanInputEnabled = true;
+        forfeitButton.SetActive(true);
     }
 
     public void ShowWarning(string warning)
@@ -181,7 +191,7 @@ public class Manager : MonoBehaviour
         warningMessge.text = warning;
     }
 
-    public void GameEnd(int gameScore, int theirScore, bool won)
+    public void GameEnd(float gameScore, float theirScore, bool won)
     {
         if (won)
         {
@@ -199,6 +209,11 @@ public class Manager : MonoBehaviour
         forfeitButton.SetActive(false);
     }
 
+    public void SetScore(float score)
+    {
+        scoreText.text = score.ToString();
+    }
+
     public void Forfeit()
     {
         connectToServer.SendForfeit();
@@ -213,14 +228,45 @@ public class Manager : MonoBehaviour
         Application.Quit();
     }
 
+    public void SetMyTurn(bool isMyTurn)
+    {
+        myTurn = isMyTurn;
+
+        if (myTurn)
+        {
+            turnsText.text = "Our Turn";
+        }
+        else
+        {
+            turnsText.text = "Their Turn";
+        }
+    }
+
+    public void GamePlayedAvA()
+    {
+        myTurn = !myTurn;
+
+        if (myTurn)
+        {
+            turnsText.text = "Our Turn";
+        }
+        else
+        {
+            turnsText.text = "Their Turn";
+        }
+    }
+
     public void RestartGame()
     {
         boardObject.ClearBoard();
 
         restartButton.SetActive(false);
+        forfeitButton.SetActive(false);
 
         scoreText.text = "";
         wonState.text = "";
+
+        turnsText.text = "";
 
         for (int i = 0; i < inputMainMenu.Length; i++)
         {

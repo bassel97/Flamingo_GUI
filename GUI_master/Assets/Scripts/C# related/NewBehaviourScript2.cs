@@ -206,7 +206,8 @@ public class NewBehaviourScript2 : MonoBehaviour
 
                 AckAI_VS_AI_Data ackAI_VS_AI = JsonConvert.DeserializeObject<AckAI_VS_AI_Data>(serverMsg);
 
-                //sendOptions = SendOptions.AckAI_VS_AI;
+                manager.SetMyTurn(ackAI_VS_AI.myTurn);
+
                 SendAck();
 
                 break;
@@ -215,6 +216,11 @@ public class NewBehaviourScript2 : MonoBehaviour
 
                 MoveData moveConfigData = JsonConvert.DeserializeObject<MoveData>(serverMsg);
                 boardObject.PlaceStone(moveConfigData.y, moveConfigData.x, moveConfigData.color != 'b');
+
+                if (moveConfigData.score > 0)
+                    manager.SetScore(moveConfigData.score);
+
+                manager.GamePlayedAvA();
 
                 //sendOptions = SendOptions.Ack;
                 SendAck();
@@ -225,8 +231,7 @@ public class NewBehaviourScript2 : MonoBehaviour
 
                 GameEndData gameEndData = JsonConvert.DeserializeObject<GameEndData>(serverMsg);
                 manager.GameEnd(gameEndData.ourScore, gameEndData.theirScore, gameEndData.win);
-
-                //sendOptions = SendOptions.Ack;
+                
                 SendAck();
 
                 break;
@@ -260,6 +265,10 @@ public class NewBehaviourScript2 : MonoBehaviour
 
             case MsgsEnum.gameStart:
 
+                GameStartData gameStartData = JsonConvert.DeserializeObject<GameStartData>(serverMsg);
+
+                manager.SetMyTurn(gameStartData.myTurn);
+
                 manager.ResumeGame();
 
                 SendAck();
@@ -278,6 +287,9 @@ public class NewBehaviourScript2 : MonoBehaviour
                 boardObject.PlaceStone(moveData.y, moveData.x, moveData.color != 'b');
 
                 manager.AiPlayed();
+
+                if (moveData.score > 0)
+                    manager.SetScore(moveData.score);
 
                 //sendOptions = SendOptions.Ack;
                 SendAck();

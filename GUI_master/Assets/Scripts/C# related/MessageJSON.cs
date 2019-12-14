@@ -27,6 +27,12 @@ public class AckAI_VS_AI_Data
     public float theirRemainingTime { get; set; }
     public float ourRemainingTime { get; set; }
     public int initialCount { get; set; }
+    public bool myTurn { get; set; }
+}
+
+public class GameStartData
+{
+    public bool myTurn { get; set; }
 }
 
 public class MoveData
@@ -37,14 +43,18 @@ public class MoveData
     public char color { get; set; }
 
     public int countCaptured { get; set; }
+
+    public float timer { get; set; }
+
+    public float score { get; set; }
 }
 
 public class GameEndData
 {
     public bool win { get; set; }
 
-    public int ourScore { get; set; }
-    public int theirScore { get; set; }
+    public float ourScore { get; set; }
+    public float theirScore { get; set; }
 }
 
 public class AI_VS_AI_Data
