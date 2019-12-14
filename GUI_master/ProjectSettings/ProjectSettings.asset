@@ -16,7 +16,7 @@ PlayerSettings:
   productName: GUI
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
-  m_SplashScreenBackgroundColor: {r: 0.9294118, g: 0.121568635, b: 0.5294118, a: 1}
+  m_SplashScreenBackgroundColor: {r: 0.671, g: 0.09059915, b: 0.3822152, a: 1}
   m_ShowUnitySplashScreen: 1
   m_ShowUnitySplashLogo: 1
   m_SplashScreenOverlayOpacity: 1
@@ -260,7 +260,7 @@ PlayerSettings:
   - m_BuildTarget: Standalone
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 1f1d285a7855e0243838474ad714362a, type: 3}
+      m_Icon: {fileID: 0}
       m_Width: 1024
       m_Height: 1024
       m_Kind: 0

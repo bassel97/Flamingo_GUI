@@ -58,7 +58,7 @@ public class NewBehaviourScript2 : MonoBehaviour
     private void SendAck()
     {
         Dictionary<string, int> dictionary = new Dictionary<string, int>();
-        dictionary.Add("type", (int)MsgsEnum.AI_VS_AI);
+        dictionary.Add("type", (int)MsgsEnum.ack);
         dictionary.Add("msg", 0);
 
         string ackMsg = JsonConvert.SerializeObject(dictionary);
@@ -232,6 +232,11 @@ public class NewBehaviourScript2 : MonoBehaviour
                 break;
 
             case MsgsEnum.gamePaused:
+
+                manager.PauseGame();
+
+                SendAck();
+
                 break;
 
             case MsgsEnum.exit:
@@ -244,12 +249,21 @@ public class NewBehaviourScript2 : MonoBehaviour
 
                 if (ackData.valid)
                     manager.PlayerMoveAccepted();
+                else
+                    manager.PlayerMoveNotAccepted();
+
+                manager.ShowWarning(ackData.reason);
 
                 SendAck();
 
                 break;
 
             case MsgsEnum.gameStart:
+
+                manager.ResumeGame();
+
+                SendAck();
+
                 break;
 
             case MsgsEnum.AI_VSHuman:
@@ -294,6 +308,8 @@ public class NewBehaviourScript2 : MonoBehaviour
     {
         if (s == null)
             return;
+
+        SendGameExit();
 
         s.Close();
 

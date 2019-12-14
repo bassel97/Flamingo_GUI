@@ -24,7 +24,14 @@ public class Manager : MonoBehaviour
     [SerializeField] private GameObject initialBoardOptions = null;
     [SerializeField] private Dropdown initialBoardOptionsDropDown = null;
 
+    [Header("GUI")]
+    [SerializeField] private Text warningMessge = null;
+    [SerializeField] private Text gamePausedText = null;
+
+    [Header("Main Menu")]
     public GameObject mainMenu;
+    public InputField[] inputMainMenu;
+    public Dropdown[] dropdownMainMenu;
 
     private bool humanVsAI = false;
     private bool humanInputEnabled = false;
@@ -110,7 +117,13 @@ public class Manager : MonoBehaviour
             humanInputEnabled = false;
 
         if (initialCount > 0)
+        {
             initialBoardOptions.SetActive(true);
+        }
+        else
+        {
+            forfeitButton.SetActive(true);
+        }
 
         humanVsAI = true;
     }
@@ -131,6 +144,8 @@ public class Manager : MonoBehaviour
             if (initialCount <= 0)
             {
                 initialBoardOptions.SetActive(false);
+
+                forfeitButton.SetActive(true);
             }
         }
         else if (humanInputEnabled)
@@ -139,6 +154,8 @@ public class Manager : MonoBehaviour
 
             lastMoveI = i;
             lastMoveJ = j;
+
+            humanInputEnabled = false;
         }
     }
 
@@ -154,11 +171,21 @@ public class Manager : MonoBehaviour
         boardObject.PlaceStone(lastMoveI, lastMoveJ, playerColor == 'w');
     }
 
+    public void PlayerMoveNotAccepted()
+    {
+        humanInputEnabled = true;
+    }
+
+    public void ShowWarning(string warning)
+    {
+        warningMessge.text = warning;
+    }
+
     public void GameEnd(int gameScore, int theirScore, bool won)
     {
         if (won)
         {
-            if(gameScore == theirScore)
+            if (gameScore == theirScore)
                 wonState.text = "Draw";
             else
                 wonState.text = "You Won";
@@ -175,6 +202,8 @@ public class Manager : MonoBehaviour
     public void Forfeit()
     {
         connectToServer.SendForfeit();
+
+        RestartGame();
     }
 
     public void GameExit()
@@ -192,6 +221,18 @@ public class Manager : MonoBehaviour
 
         scoreText.text = "";
         wonState.text = "";
+
+        for (int i = 0; i < inputMainMenu.Length; i++)
+        {
+            inputMainMenu[i].text = "";
+        }
+
+        warningMessge.text = "";
+
+        for (int i = 0; i < dropdownMainMenu.Length; i++)
+        {
+            dropdownMainMenu[i].value = 0;
+        }
 
         mainMenu.SetActive(true);
 
@@ -214,4 +255,15 @@ public class Manager : MonoBehaviour
         initialBoardOptionsDropDown.value = 0;
     }
 
+    public void PauseGame()
+    {
+        boardObject.ClearBoard();
+
+        gamePausedText.gameObject.SetActive(true);
+    }
+
+    public void ResumeGame()
+    {
+        gamePausedText.gameObject.SetActive(false);
+    }
 }
