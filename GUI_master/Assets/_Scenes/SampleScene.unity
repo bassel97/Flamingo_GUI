@@ -3035,7 +3035,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Their timer
+  m_Text: 
 --- !u!222 &791907915
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6640,7 +6640,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Our Timer
+  m_Text: 
 --- !u!222 &1598077590
 CanvasRenderer:
   m_ObjectHideFlags: 0

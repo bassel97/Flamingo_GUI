@@ -24,7 +24,7 @@ public class TimerObject : MonoBehaviour
             {
                 timer -= Time.deltaTime;
 
-                timerText.text = startingString + ":\n" + timer;
+                timerText.text = startingString + ":\n" + (int)(timer/60) + " : " + ((int)timer % 60);
             }
             else
             {

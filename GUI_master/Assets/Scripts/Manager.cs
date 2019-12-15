@@ -151,8 +151,10 @@ public class Manager : MonoBehaviour
                 initialBoardOptions.SetActive(false);
 
                 if (humanInputEnabled)
+                {
                     forfeitButton.SetActive(true);
                     passButton.SetActive(true);
+                }
             }
         }
         else if (humanInputEnabled)
@@ -234,6 +236,11 @@ public class Manager : MonoBehaviour
 
         scoreText.text = gameScore + "-" + theirScore;
 
+        ourTimer.StopTimer();
+        theirTimer.StopTimer();
+
+        turnsText.text = "";
+
         restartButton.SetActive(true);
         forfeitButton.SetActive(false);
         passButton.SetActive(false);
@@ -265,12 +272,12 @@ public class Manager : MonoBehaviour
         if (myTurn)
         {
             turnsText.text = "Our Turn";
-            ourTimer.StartTimer(15 * 60);
+            ourTimer.ResumeTimer();
         }
         else
         {
             turnsText.text = "Their Turn";
-            theirTimer.StartTimer(15 * 60);
+            theirTimer.ResumeTimer();
         }
     }
 
@@ -300,6 +307,9 @@ public class Manager : MonoBehaviour
 
         ourTimer.StopTimer();
         theirTimer.StopTimer();
+
+        ourTimer.OverrideTimer(15 * 60);
+        theirTimer.OverrideTimer(15 * 60);
 
         restartButton.SetActive(false);
         forfeitButton.SetActive(false);
@@ -346,6 +356,9 @@ public class Manager : MonoBehaviour
     public void PauseGame()
     {
         boardObject.ClearBoard();
+
+        ourTimer.PauseTimer();
+        theirTimer.PauseTimer();
 
         gamePausedText.gameObject.SetActive(true);
     }

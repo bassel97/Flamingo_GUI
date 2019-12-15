@@ -189,7 +189,7 @@ public class NewBehaviourScript2 : MonoBehaviour
         string ServerReply = sr.ReadLine();
 
         Debug.Log("Recvd " + ServerReply);
-        loggerText.text += "Recvd " + ServerReply + "\n";
+        loggerText.text = "Recvd " + ServerReply + "\n";
 
         Dictionary<string, object> ServerReplyDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(ServerReply);
 
