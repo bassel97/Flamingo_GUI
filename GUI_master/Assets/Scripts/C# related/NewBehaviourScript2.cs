@@ -217,8 +217,15 @@ public class NewBehaviourScript2 : MonoBehaviour
                 MoveData moveConfigData = JsonConvert.DeserializeObject<MoveData>(serverMsg);
                 boardObject.PlaceStone(moveConfigData.y, moveConfigData.x, moveConfigData.color != 'b');
 
-                if (moveConfigData.score > 0)
-                    manager.SetScore(moveConfigData.score);
+                if (moveConfigData.ourScore > 0 || moveConfigData.theirScore > 0)
+                    manager.SetScore(moveConfigData.ourScore, moveConfigData.theirScore);
+
+                if (moveConfigData.ourTimer > 0)
+                    manager.SetOurTimer(moveConfigData.ourTimer);
+
+
+                if (moveConfigData.theirTimer > 0)
+                    manager.SetTheirTimer(moveConfigData.theirTimer);
 
                 manager.GamePlayedAvA();
 
@@ -253,7 +260,12 @@ public class NewBehaviourScript2 : MonoBehaviour
                 Debug.Log("Ack data " + ackData.reason + " " + ackData.valid + " " + ackData.valid);
 
                 if (ackData.valid)
+                {
                     manager.PlayerMoveAccepted();
+
+                    if (ackData.ourScore > 0 || ackData.theirScore > 0)
+                        manager.SetScore(ackData.ourScore, ackData.theirScore);
+                }
                 else
                     manager.PlayerMoveNotAccepted();
 
@@ -288,8 +300,8 @@ public class NewBehaviourScript2 : MonoBehaviour
 
                 manager.AiPlayed();
 
-                if (moveData.score > 0)
-                    manager.SetScore(moveData.score);
+                if (moveData.ourScore > 0 || moveData.theirScore > 0)
+                    manager.SetScore(moveData.ourScore, moveData.theirScore);
 
                 //sendOptions = SendOptions.Ack;
                 SendAck();

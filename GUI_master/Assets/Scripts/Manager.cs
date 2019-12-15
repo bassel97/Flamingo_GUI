@@ -19,6 +19,7 @@ public class Manager : MonoBehaviour
 
     [SerializeField] private GameObject restartButton = null;
     [SerializeField] private GameObject forfeitButton = null;
+    [SerializeField] private GameObject passButton = null;
 
     [Header("Initial Board")]
     [SerializeField] private GameObject initialBoardOptions = null;
@@ -126,6 +127,7 @@ public class Manager : MonoBehaviour
         else if (humanInputEnabled)
         {
             forfeitButton.SetActive(true);
+            passButton.SetActive(true);
         }
 
         humanVsAI = true;
@@ -150,6 +152,7 @@ public class Manager : MonoBehaviour
 
                 if (humanInputEnabled)
                     forfeitButton.SetActive(true);
+                    passButton.SetActive(true);
             }
         }
         else if (humanInputEnabled)
@@ -161,7 +164,30 @@ public class Manager : MonoBehaviour
 
             humanInputEnabled = false;
             forfeitButton.SetActive(false);
+            passButton.SetActive(false);
         }
+    }
+
+    [Header("Timers")]
+    public TimerObject ourTimer;
+    public TimerObject theirTimer;
+    public void SetOurTimer(float stime)
+    {
+        ourTimer.OverrideTimer(stime);
+    }
+
+    public void SetTheirTimer(float stime)
+    {
+        theirTimer.OverrideTimer(stime);
+    }
+
+    public void HumanPassed()
+    {
+        connectToServer.SendMoveData(-1, -1, playerColor);
+
+        humanInputEnabled = false;
+        forfeitButton.SetActive(false);
+        passButton.SetActive(false);
     }
 
     public void AiPlayed()
@@ -170,6 +196,7 @@ public class Manager : MonoBehaviour
         {
             humanInputEnabled = true;
             forfeitButton.SetActive(true);
+            passButton.SetActive(true);
         }
     }
 
@@ -177,6 +204,7 @@ public class Manager : MonoBehaviour
     {
         humanInputEnabled = false;
         forfeitButton.SetActive(false);
+        passButton.SetActive(false);
         boardObject.PlaceStone(lastMoveI, lastMoveJ, playerColor == 'w');
     }
 
@@ -184,6 +212,7 @@ public class Manager : MonoBehaviour
     {
         humanInputEnabled = true;
         forfeitButton.SetActive(true);
+        passButton.SetActive(true);
     }
 
     public void ShowWarning(string warning)
@@ -207,11 +236,12 @@ public class Manager : MonoBehaviour
 
         restartButton.SetActive(true);
         forfeitButton.SetActive(false);
+        passButton.SetActive(false);
     }
 
-    public void SetScore(float score)
+    public void SetScore(float ourScore, float theirScore)
     {
-        scoreText.text = score.ToString();
+        scoreText.text = ourScore.ToString() + "-" + theirScore.ToString();
     }
 
     public void Forfeit()
@@ -235,10 +265,12 @@ public class Manager : MonoBehaviour
         if (myTurn)
         {
             turnsText.text = "Our Turn";
+            ourTimer.StartTimer(15 * 60);
         }
         else
         {
             turnsText.text = "Their Turn";
+            theirTimer.StartTimer(15 * 60);
         }
     }
 
@@ -249,10 +281,16 @@ public class Manager : MonoBehaviour
         if (myTurn)
         {
             turnsText.text = "Our Turn";
+
+            ourTimer.ResumeTimer();
+            theirTimer.PauseTimer();
         }
         else
         {
             turnsText.text = "Their Turn";
+
+            ourTimer.PauseTimer();
+            theirTimer.ResumeTimer();
         }
     }
 
@@ -260,8 +298,12 @@ public class Manager : MonoBehaviour
     {
         boardObject.ClearBoard();
 
+        ourTimer.StopTimer();
+        theirTimer.StopTimer();
+
         restartButton.SetActive(false);
         forfeitButton.SetActive(false);
+        passButton.SetActive(false);
 
         scoreText.text = "";
         wonState.text = "";

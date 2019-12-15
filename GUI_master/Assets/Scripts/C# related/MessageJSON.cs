@@ -44,9 +44,11 @@ public class MoveData
 
     public int countCaptured { get; set; }
 
-    public float timer { get; set; }
+    public float ourTimer { get; set; }
+    public float theirTimer { get; set; }
 
-    public float score { get; set; }
+    public float ourScore { get; set; }
+    public float theirScore { get; set; }
 }
 
 public class GameEndData
@@ -80,4 +82,7 @@ public class AckData
     public bool valid { get; set; }
     public string reason { get; set; }
     public int countCaptured { get; set; }
+
+    public float ourScore { get; set; }
+    public float theirScore { get; set; }
 }

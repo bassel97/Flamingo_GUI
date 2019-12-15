@@ -7,9 +7,11 @@ using UnityEngine.UI;
 public class TimerObject : MonoBehaviour
 {
 
-    float timer = 1500;
+    float timer = 15*60;
 
-    bool timerPaused = false;
+    bool timerPaused = true;
+
+    public string startingString = "";
 
     [Header("GUI")]
     public Text timerText;
@@ -22,7 +24,11 @@ public class TimerObject : MonoBehaviour
             {
                 timer -= Time.deltaTime;
 
-                timerText.text = "Timer:\n" + timer;
+                timerText.text = startingString + ":\n" + timer;
+            }
+            else
+            {
+                StopTimer();
             }
         }
     }
@@ -32,7 +38,12 @@ public class TimerObject : MonoBehaviour
         if (initialValue < 0)
             return;
 
-        timer = initialValue / 1000;
+        timer = initialValue;
+    }
+
+    public void OverrideTimer(float timerValue)
+    {
+        timer = timerValue;
     }
 
     public void PauseTimer()
@@ -43,6 +54,12 @@ public class TimerObject : MonoBehaviour
     public void ResumeTimer()
     {
         timerPaused = false;
+    }
+
+    public void StopTimer()
+    {
+        timerText.text = "";
+        timerPaused = true;
     }
 
     /*public void SetTimer(float val)
