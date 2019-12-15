@@ -33,6 +33,9 @@ public class AckAI_VS_AI_Data
 public class GameStartData
 {
     public bool myTurn { get; set; }
+    
+    public float theirRemainingTime { get; set; }
+    public float ourRemainingTime { get; set; }
 }
 
 public class MoveData

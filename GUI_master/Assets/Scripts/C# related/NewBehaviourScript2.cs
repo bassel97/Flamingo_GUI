@@ -208,6 +208,12 @@ public class NewBehaviourScript2 : MonoBehaviour
 
                 manager.SetMyTurn(ackAI_VS_AI.myTurn);
 
+                if (ackAI_VS_AI.ourRemainingTime > 0)
+                    manager.SetOurTimer(ackAI_VS_AI.ourRemainingTime / 1000.0f);
+
+                if (ackAI_VS_AI.theirRemainingTime > 0)
+                    manager.SetTheirTimer(ackAI_VS_AI.theirRemainingTime / 1000.0f);
+
                 SendAck();
 
                 break;
@@ -221,11 +227,10 @@ public class NewBehaviourScript2 : MonoBehaviour
                     manager.SetScore(moveConfigData.ourScore, moveConfigData.theirScore);
 
                 if (moveConfigData.ourTimer > 0)
-                    manager.SetOurTimer(moveConfigData.ourTimer);
-
+                    manager.SetOurTimer(moveConfigData.ourTimer / 1000.0f);
 
                 if (moveConfigData.theirTimer > 0)
-                    manager.SetTheirTimer(moveConfigData.theirTimer);
+                    manager.SetTheirTimer(moveConfigData.theirTimer / 1000.0f);
 
                 manager.GamePlayedAvA();
 
@@ -280,6 +285,12 @@ public class NewBehaviourScript2 : MonoBehaviour
                 GameStartData gameStartData = JsonConvert.DeserializeObject<GameStartData>(serverMsg);
 
                 manager.SetMyTurn(gameStartData.myTurn);
+
+                if (gameStartData.ourRemainingTime > 0)
+                    manager.SetOurTimer(gameStartData.ourRemainingTime / 1000.0f);
+
+                if (gameStartData.theirRemainingTime > 0)
+                    manager.SetTheirTimer(gameStartData.theirRemainingTime / 1000.0f);
 
                 manager.ResumeGame();
 
